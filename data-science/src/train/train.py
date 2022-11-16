@@ -54,7 +54,8 @@ def parse_args():
     '''Parse input arguments'''
 
     parser = argparse.ArgumentParser("train")
-    parser.add_argument("--train_data", type=str, help="Path to train dataset")
+    
+    parser.add_argument(### TO DO: Add train_data argument ###)
     parser.add_argument("--model_output", type=str, help="Path of output model")
 
     # classifier specific arguments

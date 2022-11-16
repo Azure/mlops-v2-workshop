@@ -1,8 +1,8 @@
 $schema: https://azuremlschemas.azureedge.net/latest/batchDeployment.schema.json
 name: taxi-batch-dp
-endpoint_name: taxi-batch-endpoint
+endpoint_name: ### TO DO ###
 model: azureml:taxi-model@latest
-compute: azureml:batch-cluster
+compute: ### TO DO ###
 resources:
   instance_count: 1
 max_concurrency_per_instance: 2

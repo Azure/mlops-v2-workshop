@@ -7,7 +7,7 @@ description: Training Pipeline to train a model that predicts taxi fare price
 inputs:
   input:
     type: uri_file
-    path: azureml:taxi-data@latest
+    path: ### TO DO ###
   enable_monitoring: "false"
   table_name: 'taximonitoring'
 
@@ -23,7 +23,7 @@ outputs:
 # <jobs>
 settings:
   default_datastore: azureml:workspaceblobstore
-  default_compute: azureml:cpu-cluster
+  default_compute: ### TO DO ###
   continue_on_step_failure: false
 
 jobs:
@@ -76,7 +76,7 @@ jobs:
     environment: azureml:taxi-train-env@latest
     inputs:
       model_name: "taxi-model"
-      model_input: ${{parent.jobs.train_model.outputs.model_output}}
+      model_input: ### TO DO ###
       test_data: ${{parent.jobs.prep_data.outputs.test_data}}
     outputs:
       evaluation_output: ${{parent.outputs.evaluation_output}}

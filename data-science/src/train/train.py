@@ -96,13 +96,7 @@ def main(args):
                                   random_state=0)
 
     # log model hyperparameters
-    mlflow.log_param("model", "RandomForestRegressor")
-    mlflow.log_param("n_estimators", args.regressor__n_estimators)
-    mlflow.log_param("bootstrap", args.regressor__bootstrap)
-    mlflow.log_param("max_depth", args.regressor__max_depth)
-    mlflow.log_param("max_features", args.regressor__max_features)
-    mlflow.log_param("min_samples_leaf", args.regressor__min_samples_leaf)
-    mlflow.log_param("min_samples_split", args.regressor__min_samples_split)
+    ### TO DO: Use mlflow to log hyperparameters as parameters to AML run.
 
     # Train model with the train set
     model.fit(X_train, y_train)
@@ -117,10 +111,7 @@ def main(args):
     mae = mean_absolute_error(y_train, yhat_train)
     
     # log model performance metrics
-    mlflow.log_metric("train r2", r2)
-    mlflow.log_metric("train mse", mse)
-    mlflow.log_metric("train rmse", rmse)
-    mlflow.log_metric("train mae", mae)
+    ### TO DO: Use mlflow to log training evaluation metrics as parameters to AML run.
 
     # Visualize results
     plt.scatter(y_train, yhat_train,  color='black')
@@ -131,7 +122,7 @@ def main(args):
     mlflow.log_artifact("regression_results.png")
     
     # Log the model using mlflow
-    mlflow.sklearn.log_model(model, args.model_output)
+    ### TO DO: Use mlflow to log model to AML run outputs.
 
     # Save the model using mlflow
     mlflow.sklearn.save_model(model, args.model_output)

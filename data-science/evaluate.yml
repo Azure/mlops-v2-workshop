@@ -14,7 +14,7 @@ outputs:
     evaluation_output: 
         type: uri_folder
 code: src/evaluate
-environment: azureml:taxi-train-env@latest
+environment: ## TO DO
 command: >-
     python evaluate.py 
     --model_name ${{inputs.model_name}} 

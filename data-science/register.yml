@@ -14,7 +14,7 @@ outputs:
     model_info_output_path: 
         type: uri_folder
 code: src/register
-environment: azureml:taxi-train-env@latest
+environment: # TO DO
 command: >-
     python register.py 
     --model_name ${{inputs.model_name}} 

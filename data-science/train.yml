@@ -10,7 +10,7 @@ outputs:
     model_output: 
         type: uri_folder
 code: src/train
-environment: azureml:taxi-train-env@latest
+environment: # TO DO
 command: >-
     python train.py 
     --train_data ${{inputs.train_data}} 

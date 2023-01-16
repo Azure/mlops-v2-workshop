@@ -72,3 +72,12 @@ Pay attention to the input and output arguments of these scripts and how are the
 
 4- The objective of the CI/CD pipelines available in `mlops/azure-devops` is to automate the model training and deployment delivery process (executed in notebook `azureml-cliv2.ipynb`) using CI/CD Azure Devops pipelines.
 
+
+
+
+
+
+
+
+
+

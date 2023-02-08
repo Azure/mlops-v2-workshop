@@ -31,7 +31,7 @@ jobs:
     - name: install-extension
       run:  |
         az extension add -n ml -y
-        az configure --defaults group=${{vars.resource_group}} workspace=${{workspace_name}}
+        az configure --defaults group=${{vars.resource_group}} workspace=${{vars.workspace_name}
 
     - name: run job
       run: bash -x ./run-job.sh train/pipeline-code.yml ${{inputs.experiment_name}}

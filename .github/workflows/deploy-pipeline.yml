@@ -27,5 +27,6 @@ jobs:
         run: |
           run_id=$(az ml job create --file ml-pipelines/cli/train/pipeline.yml --resource-group openaml \
           --workspace-name nlp-workspace --query name -o tsv)
-          echo "aml-job=$run_id" >> $GITHUB_OUTPUT;
+          echo $run_id
+          echo "aml-job=$(echo $run_id)" >> $GITHUB_OUTPUT;
         

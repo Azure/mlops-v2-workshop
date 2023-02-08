@@ -28,8 +28,6 @@ settings:
 
 jobs:
   prep_data:
-    #name: prep_data
-    #display_name: prep-data
     component: ../../../components/prep.yml
     
     inputs:
@@ -42,8 +40,6 @@ jobs:
       test_data: ${{parent.outputs.test_data}}
 
   train_model:
-    #name: train_model
-    #display_name: train-model
     component: ../../../components/train.yml
    
     inputs:
@@ -52,8 +48,6 @@ jobs:
       model_output: ${{parent.outputs.trained_model}}
   
   evaluate_model:
-    #name: evaluate_model
-    #display_name: evaluate-model
     component: ../../../components/evaluate.yml
    
     inputs:
@@ -64,8 +58,6 @@ jobs:
       evaluation_output: ${{parent.outputs.evaluation_output}}
 
   register_model:
-    #name: register_model
-    #display_name: register-model
     component: ../../../components/register.yml
     
     inputs:

@@ -1,0 +1,31 @@
+# Simple deployment pipeline REPLACE ECPERIMENT NAME
+name: deploy-training-pipeline
+on:
+  workflow_dispatch:
+  
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+      url: ${{ steps.run-ml-pipeline.outputs.aml-job }}
+    outputs:
+       aml-job: ${{ steps.run-ml-pipeline.outputs.aml-job }}  
+  
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+          
+      - name: install-extension
+        run:  az extension add -n ml -y
+     
+      - name: run-ml-pipeline
+        run: |
+          run_id=$(az ml job create --file ml-pipelines/cli/train/pipeline.yml --resource-group openaml \
+          --workspace-name nlp-workspace --query name -o tsv)
+          echo "aml-job=$run_id" >> $GITHUB_OUTPUT;
+        

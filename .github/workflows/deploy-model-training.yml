@@ -1,22 +1,31 @@
-name: deploy-cv-model-training-pipeline
+name: run-nyc-taxi-pipeline
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "4 6/12 * * *"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ml-pipelines/**
+      - .github/workflows/train-model-pipeline.yml
+      - components/**
+      - ci-cd/ghactions/**
 jobs:
-  run-pipeline:
+  run-training-pipeline:
     runs-on: ubuntu-latest
+    # environment: dev
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: 'Az CLI login'
-        uses: azure/login@v1
-        with:
-          creds: ${{secrets.AZURE_CREDENTIALS}}
-          
-      - name: install-extension
-        run:  az extension add -n ml -y
-     
-      - name: run-ml-pipeline
-        run: |
-          az ml job create --file ml-pipelines/cli/train/pipeline.yml --resource-group openaml \
-          --workspace-name nlp-workspace --query name -o tsv 
-          
+    - name: check out repo
+      uses: actions/checkout@v2
+    - name: azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+    - name: setup
+      run: bash setup-cli.sh
+      working-directory: ci-cd/ghactions
+      continue-on-error: true
+    - name: run job
+      run: bash -x ./run-job.sh train/pipeline-code.yml
+      working-directory: ml-pipelines/cli

@@ -28,18 +28,10 @@ settings:
 
 jobs:
   prep_data:
-    name: prep_data
-    display_name: prep-data
-    code: ../../../components/prep
-    command: >-
-      python prep.py 
-      --raw_data ${{inputs.raw_data}} 
-      --train_data ${{outputs.train_data}}
-      --val_data ${{outputs.val_data}}
-      --test_data ${{outputs.test_data}}
-      --enable_monitoring ${{inputs.enable_monitoring}}
-      --table_name ${{inputs.table_name}}
-    environment: azureml:taxi-train-env@latest
+    #name: prep_data
+    #display_name: prep-data
+    component: ../../../components/prep.yml
+    
     inputs:
       raw_data: ${{parent.inputs.input}}
       enable_monitoring: ${{parent.inputs.enable_monitoring}}
@@ -50,30 +42,20 @@ jobs:
       test_data: ${{parent.outputs.test_data}}
 
   train_model:
-    name: train_model
-    display_name: train-model
-    code: ../../../components/train
-    command: >-
-      python train.py 
-      --train_data ${{inputs.train_data}} 
-      --model_output ${{outputs.model_output}}
-    environment: azureml:taxi-train-env@latest
+    #name: train_model
+    #display_name: train-model
+    component: ../../../components/train.yml
+   
     inputs:
       train_data: ${{parent.jobs.prep_data.outputs.train_data}}
     outputs:
       model_output: ${{parent.outputs.trained_model}}
   
   evaluate_model:
-    name: evaluate_model
-    display_name: evaluate-model
-    code: ../../../components/evaluate
-    command: >-
-      python evaluate.py 
-      --model_name ${{inputs.model_name}} 
-      --model_input ${{inputs.model_input}} 
-      --test_data ${{inputs.test_data}} 
-      --evaluation_output ${{outputs.evaluation_output}}
-    environment: azureml:taxi-train-env@latest
+    #name: evaluate_model
+    #display_name: evaluate-model
+    component: ../../../components/evaluate.yml
+   
     inputs:
       model_name: "taxi-model"
       model_input: ${{parent.jobs.train_model.outputs.model_output}}
@@ -82,16 +64,10 @@ jobs:
       evaluation_output: ${{parent.outputs.evaluation_output}}
 
   register_model:
-    name: register_model
-    display_name: register-model
-    code: ../../../components/register
-    command: >-
-      python register.py 
-      --model_name ${{inputs.model_name}} 
-      --model_path ${{inputs.model_path}} 
-      --evaluation_output ${{inputs.evaluation_output}}
-      --model_info_output_path ${{outputs.model_info_output_path}}
-    environment: azureml:taxi-train-env@latest
+    #name: register_model
+    #display_name: register-model
+    component: ../../../components/register.yml
+    
     inputs:
       model_name: "taxi-model"
       model_path: ${{parent.jobs.train_model.outputs.model_output}}

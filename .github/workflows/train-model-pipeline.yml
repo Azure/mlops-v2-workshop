@@ -14,7 +14,7 @@ on:
 jobs:
   run-training-pipeline:
     runs-on: ubuntu-latest
-    environment: dev
+    # environment: dev
     steps:
     - name: check out repo
       uses: actions/checkout@v2

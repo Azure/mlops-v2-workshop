@@ -18,5 +18,5 @@ jobs:
       - name: run-ml-pipeline
         run: |
           az ml job create --file ml-pipelines/cli/train/pipeline.yml --resource-group openaml \
-          --workspace-name nlpworkspace --query name -o tsv 
+          --workspace-name nlp-workspace --query name -o tsv 
           

@@ -2,13 +2,21 @@ name: deploy-cv-model-training-pipeline
 on:
   workflow_dispatch:
 jobs:
-  run-model-training-pipeline:
-
-    uses: Azure/mlops-templates/.github/workflows/run-pipeline.yml@main
-    with:
-      resource_group: 'openaml'
-      workspace_name: 'nlpworkspace'
-      parameters-file: ml-pipelines/cli/train/pipeline.yaml
-      job-name: cv-train
-    secrets:
-      creds: ${{secrets.AZURE_CREDENTIALS}}
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+          
+      - name: install-extension
+        run:  az extension add -n ml -y
+     
+      - name: run-ml-pipeline
+        run: |
+          az ml job create --file ml-pipelines/cli/train/pipeline.yml --resource-group openaml \
+          --workspace-name nlpworkspace --query name -o tsv 
+          

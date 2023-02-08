@@ -27,5 +27,5 @@ jobs:
       working-directory: ci-cd/ghactions
       continue-on-error: true
     - name: run job
-      run: bash -x ../run-job.sh train/pipeline-code.yml
+      run: bash -x ./run-job.sh train/pipeline-code.yml
       working-directory: ml-pipelines/cli

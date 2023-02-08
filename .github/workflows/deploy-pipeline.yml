@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: dev
-      url: ${{ steps.run-ml-pipeline.outputs.job_uri }}
+      url: ${{ jobs.run-pipeline.outputs.job_uri }}
     outputs:
        job_uri: ${{ steps.run-ml-pipeline.outputs.job_uri }}  
   
@@ -32,9 +32,9 @@ jobs:
       - name: run-ml-pipeline
         run: |
           run_id=$(az ml job create --file ml-pipelines/cli/train/pipeline.yml --resource-group ${{vars.resource_group}} \
-          --workspace-name ${{vars.workspace_name}} --set experiment_name=${{inputs.experiment_name}} --query name -o tsv)
-          echo "JOB submitted $run_id"
+          --workspace-name ${{vars.workspace_name}} --set experiment_name=${{inputs.experiment_name}} --query name -o tsv)          
           job_uri=$(az ml job show -n $run_id --query services.Studio.endpoint --resource-group ${{vars.resource_group}} \
           --workspace-name ${{vars.workspace_name}})
+          echo "JOB submitted $run_id $job_uri"
           echo "job_uri=$(echo $job_uri)" >> $GITHUB_OUTPUT;
         

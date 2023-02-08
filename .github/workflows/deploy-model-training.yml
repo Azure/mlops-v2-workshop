@@ -1,20 +1,25 @@
-name: run-nyc-taxi-pipeline
+name: train-and-deploy-model
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "4 6/12 * * *"
+    inputs:
+      experiment_name:
+        required: true
+        type: string
+        description: experiment name in AML workspace
+        default: taxi-training-pipeline
+
   pull_request:
     branches:
       - main
     paths:
       - ml-pipelines/**
-      - .github/workflows/train-model-pipeline.yml
+      - .github/workflows/deploy-model-training.yml
       - components/**
       - ci-cd/ghactions/**
 jobs:
   run-training-pipeline:
     runs-on: ubuntu-latest
-    # environment: dev
+    environment: dev
     steps:
     - name: check out repo
       uses: actions/checkout@v2
@@ -22,10 +27,10 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{secrets.AZURE_CREDENTIALS}}
-    - name: setup
-      run: bash setup-cli.sh
-      working-directory: ci-cd/ghactions
-      continue-on-error: true
+
+    - name: install-extension
+      run:  az extension add -n ml -y
+
     - name: run job
-      run: bash -x ./run-job.sh train/pipeline-code.yml
+      run: bash -x ./run-job.sh train/pipeline-code.yml ${{inputs.experiment_name}}
       working-directory: ml-pipelines/cli

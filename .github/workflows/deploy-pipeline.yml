@@ -36,6 +36,7 @@ jobs:
          
           job_uri=$(az ml job show -n $run_id --query services.Studio.endpoint --resource-group ${{vars.resource_group}} \
           --workspace-name ${{vars.workspace_name}})
+          
           echo "JOB submitted $run_id $job_uri"
           echo "job_uri=$(echo $job_uri)" >> $GITHUB_OUTPUT;
         

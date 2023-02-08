@@ -1,7 +1,13 @@
-# Simple deployment pipeline REPLACE ECPERIMENT NAME
+# Simple deployment pipeline REPLACE EXPERIMENT NAME
 name: deploy-training-pipeline
 on:
   workflow_dispatch:
+    inputs:
+      experiment_name:
+        required: true
+        type: string
+        description: experiment name in AML workspace
+        default: taxi-training-pipeline
   
 jobs:
   run-pipeline:
@@ -25,8 +31,8 @@ jobs:
      
       - name: run-ml-pipeline
         run: |
-          run_id=$(az ml job create --file ml-pipelines/cli/train/pipeline.yml --resource-group openaml \
-          --workspace-name nlp-workspace --query name -o tsv)
-          echo $run_id
+          run_id=$(az ml job create --file ml-pipelines/cli/train/pipeline.yml --resource-group ${{vars.resource_group}} \
+          --workspace-name ${{vars.workspace_name}} --set experiment_name= ${{inputs.experiment_name}} --query name -o tsv)
+          echo "JOB submitted $run_id"
           echo "aml-job=$(echo $run_id)" >> $GITHUB_OUTPUT;
         

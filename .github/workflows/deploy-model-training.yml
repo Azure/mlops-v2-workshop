@@ -1,14 +1,9 @@
 name: deploy-cv-model-training-pipeline
-
 on:
   workflow_dispatch:
 jobs:
-  runs-on: ubuntu-latest
-   
-
-
   run-model-training-pipeline:
-   
+
     uses: Azure/mlops-templates/.github/workflows/run-pipeline.yml@main
     with:
       resource_group: 'openaml'

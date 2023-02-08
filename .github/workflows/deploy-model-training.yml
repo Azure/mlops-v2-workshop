@@ -29,7 +29,9 @@ jobs:
         creds: ${{secrets.AZURE_CREDENTIALS}}
 
     - name: install-extension
-      run:  az extension add -n ml -y
+      run:  |
+        az extension add -n ml -y
+        az configure --defaults group=${{vars.resource_group}} workspace=${{workspace_name}}
 
     - name: run job
       run: bash -x ./run-job.sh train/pipeline-code.yml ${{inputs.experiment_name}}

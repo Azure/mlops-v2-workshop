@@ -12,8 +12,9 @@ on:
       - components/**
       - ci-cd/ghactions/**
 jobs:
-  build:
+  run-training-pipeline:
     runs-on: ubuntu-latest
+    environment: dev
     steps:
     - name: check out repo
       uses: actions/checkout@v2

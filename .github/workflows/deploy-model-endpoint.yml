@@ -50,7 +50,7 @@ jobs:
       - name: create-environment-from-file
         run: |
           az ml online-endpoint create --name ${{ inputs.endpoint_name }} \
-          -f ${{ github.workspace }}/ml-pipelines/cli/online/online-endpoint.yml --resource-group ${{ vars.resource_group }} \
+          -f ${{ github.workspace }}/ml-pipelines/cli/deploy/online/online-endpoint.yml --resource-group ${{ vars.resource_group }} \
           --workspace-name ${{ vars.workspace_name }}
   
   create-deployment:

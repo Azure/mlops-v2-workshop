@@ -7,6 +7,17 @@ on:
         type: string
         description: experiment name in AML workspace
         default: taxi-training-pipeline
+      ds_name:
+        required: true
+        type: string
+        description: name of Dataset to be registeed
+        default: taxi-data  
+      env_name:  
+        required: true
+        type: string
+        description: name of Dataset to be registeed
+        default: taxi-train-env
+ 
 
   pull_request:
     branches:
@@ -17,9 +28,48 @@ on:
       - components/**
       - ci-cd/ghactions/**
 jobs:
+
+  register-environment:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+      - name: install-extension
+        run:  az extension add -n ml -y
+      
+      - name: create-environment-from-file-without-conda
+        run: |
+          az ml environment create --file ${{ github.workspace }}/ml-pipelines/train/environment.yml --resource-group ${{ vars.resource_group }} \
+                                  --workspace-name ${{ vars.workspace_name }} --name ${{ inputs.env_name }}
+  register-dataset:
+    needs: [ register-environment]
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+      - name: install-extension
+        run:  az extension add -n ml -y
+    
+      - name: create-dataset-from-file
+        if: ${{ inputs.file_type == ''}}
+        run: |
+          az ml data create --file ${{ github.workspace }}/ml-pipelines/train/data.yml --resource-group ${{ vars.resource_group }} \
+          --workspace-name ${{ vars.workspace_name }} --name ${{ inputs.ds_name }}
+     
   run-training-pipeline:
     runs-on: ubuntu-latest
     environment: dev
+    needs: [ register-environment , register-dataset]
     steps:
     - name: check out repo
       uses: actions/checkout@v2

@@ -2,34 +2,38 @@ name: deploy-pipeline-model
 on:
   workflow_dispatch:
     inputs:
-      experiment_name:
+      endpoint_name:
         required: true
         type: string
-        description: experiment name in AML workspace
-        default: taxi-training-pipeline
-      ds_name:
+        description: endpoint name
+        default: taxi-model-endpoint
+      deployment_name:
         required: true
         type: string
-        description: name of Dataset to be registeed
-        default: taxi-data  
-      env_name:  
+        description: deployment name
+        default: green  
+      model_name:  
         required: true
         type: string
-        description: name of Dataset to be registeed
-        default: taxi-train-env
- 
+        description: model name
+        default: taxi-data@latest
+      traffic_allocation:
+        required: true
+        type: string
+        description: traffic allocation
+        default: green=100
 
   pull_request:
     branches:
       - main
     paths:
       - ml-pipelines/**
-      - .github/workflows/deploy-model-training.yml
+      - .github/workflows/run-model-training.yml
       - components/**
       - ci-cd/ghactions/**
 jobs:
 
-  register-environment:
+  create-endpoint:
     runs-on: ubuntu-latest
     environment: dev
     steps:
@@ -42,12 +46,14 @@ jobs:
       - name: install-extension
         run:  az extension add -n ml -y
       
-      - name: create-environment-from-file-without-conda
+      - name: create-environment-from-file
         run: |
-          az ml environment create --file ${{ github.workspace }}/ml-pipelines/cli/train/environment.yml --resource-group ${{ vars.resource_group }} \
-                                  --workspace-name ${{ vars.workspace_name }} --name ${{ inputs.env_name }}
-  register-dataset:
-    
+          az ml online-endpoint create --name ${{ inputs.endpoint_name }} \
+          -f ${{ github.workspace }}/ml-pipelines/cli/online/online-endpoint.yml --resource-group ${{ vars.resource_group }} \
+          --workspace-name ${{ vars.workspace_name }}
+  
+  create-deployment:
+    needs: [ create-endpoint ]
     runs-on: ubuntu-latest
     environment: dev
     steps:
@@ -60,13 +66,13 @@ jobs:
       - name: install-extension
         run:  az extension add -n ml -y
     
-      - name: create-dataset-from-file
-        if: ${{ inputs.file_type == ''}}
+      - name: create-online-deployment
         run: |
-          az ml data create --file ${{ github.workspace }}/ml-pipelines/cli/train/data.yml --resource-group ${{ vars.resource_group }} \
-          --workspace-name ${{ vars.workspace_name }} --name ${{ inputs.ds_name }}
-     
-  run-training-pipeline:
+          az ml online-deployment create --name ${{ inputs.deployment_name }} --endpoint ${{ inputs.endpoint_name }} \
+          -f ${{ github.workspace }}/ml-pipelines/cli/deploy/online/online-deployment.yml --resource-group ${{ vars.resource_group }} \
+          --workspace-name ${{ vars.workspace_name }}
+
+  allocate-traffic:
     runs-on: ubuntu-latest
     environment: dev
     needs: [ register-environment , register-dataset]
@@ -81,10 +87,10 @@ jobs:
     - name: install-extension
       run:  |
         az extension add -n ml -y
-        az configure --defaults group=${{vars.resource_group}} workspace=${{vars.workspace_name}}
-
-    - name: run job
-      run: bash -x ./run-job.sh train/pipeline-code.yml ${{inputs.experiment_name}}
-      working-directory: ml-pipelines/cli
+        
+    - name: allocate-traffic
+      run: |
+          az ml online-endpoint update --name ${{ inputs.endpoint_name }} --traffic "${{ inputs.traffic_allocation }}" \
+          --resource-group ${{ vars.resource_group }} --workspace-name ${{ vars.workspace_name }}
 
   

@@ -1,5 +1,5 @@
 # Simple deployment pipeline REPLACE EXPERIMENT NAME
-name: deploy-training-pipeline
+name: run-pipeline-nowait
 on:
   workflow_dispatch:
     inputs:

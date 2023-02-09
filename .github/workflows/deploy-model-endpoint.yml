@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
     inputs:
       endpoint_name:
-        required: true
         type: string
         description: endpoint name
         default: taxi-model-endpoint
@@ -35,7 +34,7 @@ jobs:
 
   create-endpoint:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: stage
     if: ${{ inputs.endpoint_name != ''}}
     steps:
       - name: checkout
@@ -56,7 +55,7 @@ jobs:
   create-deployment:
     needs: [ create-endpoint ]
     runs-on: ubuntu-latest
-    environment: dev
+    environment: stage
     if: ${{ inputs.deployment_name != ''}}
     steps:
       - name: checkout
@@ -76,7 +75,7 @@ jobs:
 
   allocate-traffic:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: stage
     needs: [  create-deployment ]
     steps:
     - name: check out repo

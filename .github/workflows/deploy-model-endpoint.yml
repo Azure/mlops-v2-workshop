@@ -47,7 +47,7 @@ jobs:
       - name: install-extension
         run:  az extension add -n ml -y
       
-      - name: create-environment-from-file
+      - name: create-endpoint
         run: |
           endpoint=$(az ml online-endpoint show --name ${{ inputs.endpoint_name }} --query "name" \
            --output tsv --resource-group ${{ vars.resource_group }} --workspace-name ${{ vars.workspace_name }})

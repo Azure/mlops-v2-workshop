@@ -36,6 +36,7 @@ jobs:
   create-endpoint:
     runs-on: ubuntu-latest
     environment: dev
+    if: ${{ inputs.endpoint_name != ''}}
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -56,6 +57,7 @@ jobs:
     needs: [ create-endpoint ]
     runs-on: ubuntu-latest
     environment: dev
+    if: ${{ inputs.deployment_name != ''}}
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -75,7 +77,7 @@ jobs:
   allocate-traffic:
     runs-on: ubuntu-latest
     environment: dev
-    needs: [ register-environment , register-dataset]
+    needs: [  create-deployment ]
     steps:
     - name: check out repo
       uses: actions/checkout@v2

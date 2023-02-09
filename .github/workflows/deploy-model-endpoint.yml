@@ -1,4 +1,4 @@
-name: train-and-deploy-model
+name: deploy-pipeline-model
 on:
   workflow_dispatch:
     inputs:
@@ -44,10 +44,10 @@ jobs:
       
       - name: create-environment-from-file-without-conda
         run: |
-          az ml environment create --file ${{ github.workspace }}/ml-pipelines/train/environment.yml --resource-group ${{ vars.resource_group }} \
+          az ml environment create --file ${{ github.workspace }}/ml-pipelines/cli/train/environment.yml --resource-group ${{ vars.resource_group }} \
                                   --workspace-name ${{ vars.workspace_name }} --name ${{ inputs.env_name }}
   register-dataset:
-    needs: [ register-environment]
+    
     runs-on: ubuntu-latest
     environment: dev
     steps:
@@ -63,7 +63,7 @@ jobs:
       - name: create-dataset-from-file
         if: ${{ inputs.file_type == ''}}
         run: |
-          az ml data create --file ${{ github.workspace }}/ml-pipelines/train/data.yml --resource-group ${{ vars.resource_group }} \
+          az ml data create --file ${{ github.workspace }}/ml-pipelines/cli/train/data.yml --resource-group ${{ vars.resource_group }} \
           --workspace-name ${{ vars.workspace_name }} --name ${{ inputs.ds_name }}
      
   run-training-pipeline:
@@ -86,3 +86,5 @@ jobs:
     - name: run job
       run: bash -x ./run-job.sh train/pipeline-code.yml ${{inputs.experiment_name}}
       working-directory: ml-pipelines/cli
+
+  

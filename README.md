@@ -77,6 +77,7 @@ There are 2 labs in this workshop:
 ## Lab 2. Building a deployment pipeline, it could either a online endpoint or batch online. 
   - Deploy Model by nativateing to `ml-pipelines` cli or sdk and running corresponding notebooks
   - In this lab, we also provided ci-cd folder to demonstrate Azure Pipeline or Github action orchastration of CI/CD pipeline. 
+    - For GH Actions follow https://github.com/lenisha/mlops-v2-workshop/blob/main/ci-cd/README-GH.md
 
 
 

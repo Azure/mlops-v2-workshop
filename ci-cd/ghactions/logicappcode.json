@@ -1,0 +1,97 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Compose": {
+                "inputs": {
+                    "client_payload": {
+                        "data": "@triggerBody()?['data']",
+                        "integration": true,
+                        "unit": false
+                    },
+                    "event_type": "machinelearningservices-modelregistered"
+                },
+                "runAfter": {},
+                "type": "Compose"
+            },
+            "HTTP": {
+                "inputs": {
+                    "body": "@outputs('Compose')",
+                    "headers": {
+                        "Accept": "application/vnd.github+json",
+                        "Authorization": "Bearer @{parameters('PAT_TOKEN')}",
+                        "X-GitHub-Api-Version": "2022-11-28"
+                    },
+                    "method": "POST",
+                    "uri": "https://api.github.com/repos/@{parameters('REPO_NAME')}/dispatches"
+                },
+                "runAfter": {
+                    "Compose": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Http"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            },
+            "PAT_TOKEN": {
+                "defaultValue": "",
+                "type": "String"
+            },
+            "REPO_NAME": {
+                "defaultValue": "Azure/mlops-v2-workshop",
+                "type": "String"
+            }
+        },
+        "triggers": {
+            "When_a_resource_event_occurs": {
+                "inputs": {
+                    "body": {
+                        "properties": {
+                            "destination": {
+                                "endpointType": "webhook",
+                                "properties": {
+                                    "endpointUrl": "@{listCallbackUrl()}"
+                                }
+                            },
+                            "filter": {
+                                "includedEventTypes": [
+                                    "Microsoft.MachineLearningServices.ModelRegistered"
+                                ]
+                            },
+                            "topic": "/subscriptions/f9b97038-ed78-4a26-a1a7-51e81e75d867/resourceGroups/tdworkshop/providers/Microsoft.MachineLearningServices/workspaces/mlopswoskhoptd"
+                        }
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azureeventgrid_1']['connectionId']"
+                        }
+                    },
+                    "path": "/subscriptions/{topicSubscriptionId}/providers/@{encodeURIComponent('Microsoft.MachineLearningServices.Workspaces')}/resource/eventSubscriptions",
+                    "queries": {
+                        "x-ms-api-version": "2017-09-15-preview"
+                    }
+                },
+                "splitOn": "@triggerBody()",
+                "type": "ApiConnectionWebhook"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+                "azureeventgrid_1": {
+                    "connectionId": "/subscriptions/XXXXXX/resourceGroups/RGXXXXX/providers/Microsoft.Web/connections/azureeventgrid",
+                    "connectionName": "azureeventgrid",
+                    "id": "/subscriptions/XXXXX/providers/Microsoft.Web/locations/eastus/managedApis/azureeventgrid"
+                }
+            }
+        }
+    }
+}

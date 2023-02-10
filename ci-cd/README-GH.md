@@ -10,14 +10,15 @@ for bootstrapping your own MLOps projects.
 Clone this repository to your own GitHub organization and follow the steps below to deploy the demo.
 
 1. [Create an Azure Service Principal and configure GitHub actions secrets.](#configure-github-actions-secrets)
-2. [Configure dev and/or prod environments and create a dev branch.](#configure-azure-ml-environment-parameters)
-3. [Use a GitHub workflow to create Azure ML infrastructure for dev and/or prod environments.](#deploy-azure-machine-learning-infrastructure)
-4. [Use a GitHub workflow to create and run a pytorch vision model training pipeline in Azure ML.](#train-a-pytorch-classifier-in-azure-machine-learning)
-5. [Use a GitHub workflow to deploy the vision model as a real-time endpoint in Azure ML.](#deploy-the-registered-model-to-an-online-endpoint)
+2. [Configure dev and/or stage environments](#create-envoronments)
+3. [List of GitHub Flows](#list-of-github-flows)
+4. [Use a GitHub workflow to create Azure ML dataset, environment and run pipeline.](#train-prediction-model-using-pipeline)
+5. [Use a GitHub workflow to publish model to managed endpoint.](#deploy-the-registered-model-to-an-online-endpoint)
+6. [Use a GitHub workflow to publish model to managed endpoint based on Registry Event](#deploy-the-registered-model-to-an-online-endpoint-based-on-registry-event)
 
 ---
 
-## Configure GitHub Actions Secrets and Environments
+## Configure GitHub Actions Secrets
 
    This step creates a service principal and GitHub secrets to allow the GitHub action workflows to create and interact with Azure Machine Learning Workspace resources.
    
@@ -42,8 +43,11 @@ Clone this repository to your own GitHub organization and follow the steps below
    
    Copy all of this output, braces included. From your GitHub project, select **Settings**
    Select **New repository secret**. Name this secret **AZURE_CREDENTIALS** and paste the service principal output as the content of the secret.  Select **Add secret**.
+   <p align="left">
+    <img src="./images/gh-creds.png" alt="GitHub Settings" width="50%" height="50%"/>
+</p>
 
- ## Create Environment
+ ## Create Environments
 From your GitHub project, select **Settings**
 
 <p align="left">
@@ -61,19 +65,23 @@ Select **Add Environment variable**. Name this variable **RESOURCE_GROUP** and *
 ---
 
 
- ## Deploy Azure Machine Learning Infrastructure
+ ## List of Github Flows
 
    In your GitHub project repository, select **Actions**
 
    This will display the pre-defined GitHub workflows associated with your project. For a classical machine learning project, the available workflows will look similar to this:
 
- - `train-pipeline-model` - creates dataset. environment and submits pipeline to train and register model
- - `deploy-pipeline-model` - deployes model to online endpoint
- - `run-pipeline-nowait` - simple pipeline creation
+ - `run-model-training.yml` - creates dataset, environment and submits pipeline to train and register model. `train pipline model` job
+ - `deploy-model-endpoint.yml` - deployes model to online endpoint based on manual trigger or push `deploy model to endpoint` job
+ - `deploy-model-on-event.yml` - deployes model to online endpoint based on event Model Registered received from EventGrid + LogicApp. `deploy model to endpoint on event` job
+ - `run-model-pipeline-nowait.yml` - simple pipeline creation script
 
+<p align="left">
+    <img src="./images/gh-flows.png" alt="GitHub Settings" width="50%" height="50%"/>
+</p> 
 ---
 
-## Train a Taxi Prices Prediction Model in Azure Machine Learning
+## Train Prediction Model using Pipeline
 
 The https://github.com/sdonohoo/mlops-cv-demo/blob/main/.github/workflows/run-model-training.yml GitHub workflow creates the training dataset and environment in Azure ML. Then it creates an Azure ML pipeline with a few  components that trains and registers  model.
 
@@ -114,6 +122,26 @@ Run the workflow.
 ![GH-actions](./images/gh-deployflow.png)
 
 As the create-endpoint job begins, you can monitor the ednpoint creation, deployment creation, and traffic allocation in the Azure ML workspace.
+
+
+---
+
+## Deploy the Registered Model to an Online Endpoint based on Registry Event
+
+To trigger workflow based on external events we are using `repository_dispatch` event in the github actions workflow.
+This event is published by AML Workspace to Event Grid, and Logic App is setup to listen to events and invoke GH flow using REST call described in https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event
+( you could also use Azure Function instead of LogicApp - example in https://github.com/Azure/aml-function )
+
+<p align="left">
+    <img src="./images/gh-events.png" alt="centered image" width="50%" height="50%"/>
+</p>
+
+<p align="left">
+    <img src="./images/gh-logicapp.png" alt="centered image" width="50%" height="50%"/>
+</p>
+
+
+
 
 
 ---

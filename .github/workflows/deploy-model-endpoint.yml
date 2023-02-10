@@ -46,7 +46,7 @@ jobs:
             name=${{ inputs.endpoint_name }}$
             echo $name
             endpoint=$(az ml online-endpoint list  --query "[].{Name:name}"  --output table \
-            --resource-group ${{ vars.resource_group }} --workspace-name ${{ vars.workspace_name }} | grep -E $name )
+            --resource-group ${{ vars.resource_group }} --workspace-name ${{ vars.workspace_name }} | grep -q '$name' )
             if [[ -z "$endpoint" ]]
               then
                 az ml online-endpoint create --name ${{ inputs.endpoint_name }} \

@@ -45,7 +45,7 @@ jobs:
       - name: create-endpoint
         continue-on-error: true
         run: |
-           endpoint=$(az ml online-endpoint list  ---query "[].{Name:name}"  --output table \
+           endpoint=$(az ml online-endpoint list  --query "[].{Name:name}"  --output table \
            --resource-group ${{ vars.resource_group }} --workspace-name ${{ vars.workspace_name }} | grep ${{ inputs.endpoint_name }})
            if [[ -z "$endpoint" ]]
             then

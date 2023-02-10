@@ -1,4 +1,4 @@
-name: deploy-pipeline-model
+name: deploy model to endpoint 
 on:
   workflow_dispatch:
     inputs:

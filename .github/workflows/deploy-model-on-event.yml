@@ -1,15 +1,38 @@
-name: Model deployment
-
+name: deploy model to endpoint
 on:
   repository_dispatch:
     types: [machinelearningservices-modelregistered]
 
+env:
+  deployment_name: blue
+  endpoint_name: taxi-online-endpoint-en2
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: stage
+   
     steps:
       - name: Check variables
         env:
           PAYLOAD_CONTEXT: ${{ toJson(github.event.client_payload.data) }}
         run: |
           echo $PAYLOAD_CONTEXT
+          if [ -z "${{ github.event.client_payload.data.modelName }}"]; then echo "modelName id is NULL"; exit 1; else echo "model_name is ${{ toJson(github.event.client_payload.data.modelName) }}"; fi;
+          if [ -z "${{ github.event.client_payload.data.modelVersion }}"]; then echo "modelVersion is NULL"; exit 1; else echo "model_version is ${{ toJson(github.event.client_payload.data.modelVersion) }}"; fi;
+  
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+      - name: install-extension
+        run:  az extension add -n ml -y
+    
+      - name: create-online-deployment
+        run: |
+          az ml online-deployment create --name ${{ env.deployment_name }} --endpoint ${{ env.endpoint_name }} \
+          -f ${{ github.workspace }}/ml-pipelines/cli/deploy/online/online-deployment.yml --resource-group ${{ vars.resource_group }} \
+          --workspace-name ${{ vars.workspace_name }}
+      

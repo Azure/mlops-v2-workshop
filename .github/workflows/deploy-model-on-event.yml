@@ -2,16 +2,53 @@ name: deploy model to endpoint
 on:
   repository_dispatch:
     types: [machinelearningservices-modelregistered]
+    
 
 env:
   deployment_name: blue-${{github.run_number}}
   endpoint_name: taxi-online-endpoint-en2
   
 jobs:
-  deploy:
+  print-events:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check variables
+        env:
+          PAYLOAD_CONTEXT: ${{ toJson(github.event.client_payload.data) }}
+        run: |
+          echo $PAYLOAD_CONTEXT
+          if [ -z "${{ github.event.client_payload.data.modelName }}"]; then echo "modelName id is NULL"; exit 1; else echo "model_name is ${{ toJson(github.event.client_payload.data.modelName) }}"; fi;
+          if [ -z "${{ github.event.client_payload.data.modelVersion }}"]; then echo "modelVersion is NULL"; exit 1; else echo "model_version is ${{ toJson(github.event.client_payload.data.modelVersion) }}"; fi;
+   
+  create-endpoint:
     runs-on: ubuntu-latest
     environment: stage
-   
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+      - name: install-extension
+        run:  az extension add -n ml -y
+      
+      - name: create-endpoint
+        run: |
+          endpoint=$(az ml online-endpoint show --name ${{ env.endpoint_name }} --query "name" \
+           --output tsv --resource-group ${{ vars.resource_group }} --workspace-name ${{ vars.workspace_name }})
+          if [[ -z "$endpoint" ]]
+            then
+              az ml online-endpoint create --name ${{ env.endpoint_name }} \
+                -f ${{ github.workspace }}/ml-pipelines/cli/deploy/online/online-endpoint.yml --resource-group ${{ vars.resource_group }} \
+                --workspace-name ${{ vars.workspace_name }}
+            else
+              echo "Endpoint ${{ inputs.endpoint_name }} exists"
+          fi 
+
+  create-deployment:
+    needs: [ create-endpoint ]
+    runs-on: ubuntu-latest
     steps:
       - name: Check variables
         env:
@@ -35,4 +72,25 @@ jobs:
           az ml online-deployment create --name ${{ env.deployment_name }} --endpoint ${{ env.endpoint_name }} \
           -f ${{ github.workspace }}/ml-pipelines/cli/deploy/online/online-deployment.yml --resource-group ${{ vars.resource_group }} \
           --workspace-name ${{ vars.workspace_name }} --set model=azureml:${{github.event.client_payload.data.modelName}}:${{github.event.client_payload.data.modelVersion}}
-      
+  
+  allocate-traffic:
+    runs-on: ubuntu-latest
+    environment: stage
+    needs: [  create-deployment ]
+    steps:
+    - name: check out repo
+      uses: actions/checkout@v2
+    - name: azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+
+    - name: install-extension
+      run:  |
+        az extension add -n ml -y
+        
+    - name: allocate-traffic
+      run: |
+          az ml online-endpoint update --name ${{ env.endpoint_name }} --traffic "${{env.deployment_name}}=100" \
+          --resource-group ${{ vars.resource_group }} --workspace-name ${{ vars.workspace_name }}
+   

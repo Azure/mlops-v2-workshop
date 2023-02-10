@@ -1,4 +1,4 @@
-name: deploy model to endpoint
+name: deploy model to endpoint on event
 on:
   repository_dispatch:
     types: [machinelearningservices-modelregistered]

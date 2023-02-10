@@ -4,7 +4,7 @@ on:
     types: [machinelearningservices-modelregistered]
 
 env:
-  deployment_name: blue
+  deployment_name: blue-${{github.run_number}}
   endpoint_name: taxi-online-endpoint-en2
   
 jobs:

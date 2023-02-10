@@ -43,17 +43,10 @@ jobs:
       
       - name: create-endpoint
         run: |
-           endpoint=$(az ml online-endpoint list  --query "[].{Name:name}"  --output table \
-           --resource-group ${{ vars.resource_group }} --workspace-name ${{ vars.workspace_name }} | grep ${{ inputs.endpoint_name }})
-           if [[ -z "$endpoint" ]]
-            then
-              az ml online-endpoint create --name ${{ inputs.endpoint_name }} \
+           az ml online-endpoint create --name ${{ inputs.endpoint_name }} \
                 -f ${{ github.workspace }}/ml-pipelines/cli/deploy/online/online-endpoint.yml --resource-group ${{ vars.resource_group }} \
                 --workspace-name ${{ vars.workspace_name }}
-            else
-              echo "Endpoint ${{ inputs.endpoint_name }} exists"
-           fi       
-                 
+                
     
   create-deployment:
     needs: [ create-endpoint ]

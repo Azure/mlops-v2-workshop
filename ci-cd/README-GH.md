@@ -17,7 +17,7 @@ Clone this repository to your own GitHub organization and follow the steps below
 
 ---
 
-## Configure GitHub Actions Secrets
+## Configure GitHub Actions Secrets and Environments
 
    This step creates a service principal and GitHub secrets to allow the GitHub action workflows to create and interact with Azure Machine Learning Workspace resources.
    
@@ -40,8 +40,11 @@ Clone this repository to your own GitHub organization and follow the steps below
    > `"managementEndpointUrl": "https://management.core.windows.net/"`  
    > `}`
    
-   Copy all of this output, braces included. From your GitHub project, select **Settings** and create 'dev' environment:
+   Copy all of this output, braces included. From your GitHub project, select **Settings**
+   Select **New repository secret**. Name this secret **AZURE_CREDENTIALS** and paste the service principal output as the content of the secret.  Select **Add secret**.
 
+ ## Create Environment
+From your GitHub project, select **Settings**
 
 <p align="left">
     <img src="./images/gh-env.png" alt="GitHub Settings" width="50%" height="50%"/>
@@ -54,7 +57,6 @@ Select **Add Environment variable**. Name this variable **RESOURCE_GROUP** and *
 </p> 
 
 
-Select **New repository secret**. Name this secret **AZURE_CREDENTIALS** and paste the service principal output as the content of the secret.  Select **Add secret**.
 
 ---
 

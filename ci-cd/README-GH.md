@@ -128,6 +128,10 @@ As the create-endpoint job begins, you can monitor the ednpoint creation, deploy
 
 ## Deploy the Registered Model to an Online Endpoint based on Registry Event
 
+<p align="left">
+    <img src="./images/gh-eventflow.png" alt="centered image" width="50%" height="50%"/>
+</p>
+
 To trigger workflow based on external events we are using `repository_dispatch` event in the github actions workflow.
 This event is published by AML Workspace to Event Grid, and Logic App is setup to listen to events and invoke GH flow using REST call described in https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event
 ( you could also use Azure Function instead of LogicApp - example in https://github.com/Azure/aml-function )

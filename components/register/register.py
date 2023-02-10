@@ -48,7 +48,7 @@ def main(args):
         # register logged model using mlflow
         run_id = mlflow.active_run().info.run_id # run id 
         model_uri = f'runs:/{run_id}/{args.model_name}' # for logged mlflow models
-        mlflow_model = mlflow.register_model(model_uri, args.model_name)
+        mlflow_model = mlflow.._________(model_uri, args.model_name)
         model_version = mlflow_model.version
 
         # write model info

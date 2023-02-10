@@ -116,10 +116,10 @@ def main(args):
     mae = mean_absolute_error(y_train, yhat_train)
     
     # log model performance metrics
-    mlflow.log_metric("train r2", r2)
-    mlflow.log_metric("train mse", mse)
-    mlflow.log_metric("train rmse", rmse)
-    mlflow.log_metric("train mae", mae)
+    mlflow.._________("train r2", r2)
+    mlflow.._________("train mse", mse)
+    mlflow.._________("train rmse", rmse)
+    mlflow.._________("train mae", mae)
 
     # Visualize results
     plt.scatter(y_train, yhat_train,  color='black')
@@ -130,7 +130,7 @@ def main(args):
     mlflow.log_artifact("regression_results.png")
     
     # Log the model using mlflow
-    mlflow.sklearn.log_model(model, args.model_output)
+    mlflow.sklearn.._________(model, args.model_output)
 
     # Save the model using mlflow
     mlflow.sklearn.save_model(model, args.model_output)

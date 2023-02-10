@@ -2,5 +2,5 @@ $schema: https://azuremlschemas.azureedge.net/latest/managedOnlineDeployment.sch
 name: blue
 endpoint_name: taxi-online-endpoint
 model: azureml:taxi-model@latest
-instance_type: Standard_B2s
+instance_type: Standard_DS1_v2
 instance_count: 1

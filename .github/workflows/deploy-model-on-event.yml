@@ -34,5 +34,5 @@ jobs:
         run: |
           az ml online-deployment create --name ${{ env.deployment_name }} --endpoint ${{ env.endpoint_name }} \
           -f ${{ github.workspace }}/ml-pipelines/cli/deploy/online/online-deployment.yml --resource-group ${{ vars.resource_group }} \
-          --workspace-name ${{ vars.workspace_name }}
+          --workspace-name ${{ vars.workspace_name }} --set model=azureml:${{github.event.client_payload.data.modelName}}:${{github.event.client_payload.data.modelVersion}}
       

@@ -49,6 +49,7 @@ jobs:
   create-deployment:
     needs: [ create-endpoint ]
     runs-on: ubuntu-latest
+    environment: stage
     steps:
       - name: Check variables
         env:

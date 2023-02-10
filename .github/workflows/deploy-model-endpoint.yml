@@ -7,22 +7,12 @@ on:
         type: string
         description: endpoint name
         default: taxi-model-endpoint
-      deployment_name:
-        required: true
-        type: string
-        description: deployment name
-        default: green  
       model_name:  
         required: true
         type: string
         description: model name
         default: taxi-data@latest
-      traffic_allocation:
-        required: true
-        type: string
-        description: traffic allocation
-        default: green=100
-
+ 
   pull_request:
     branches:
       - main
@@ -31,6 +21,11 @@ on:
       - .github/workflows/run-model-training.yml
       - components/**
       - ci-cd/ghactions/**
+
+env:
+  deployment_name: blue-${{github.run_number}}
+  traffic_allocation: blue-${{github.run_number}}=100
+
 jobs:
 
   create-endpoint:
@@ -77,7 +72,7 @@ jobs:
     
       - name: create-online-deployment
         run: |
-          az ml online-deployment create --name ${{ inputs.deployment_name }} --endpoint ${{ inputs.endpoint_name }} \
+          az ml online-deployment create --name ${{ env.deployment_name }} --endpoint ${{ inputs.endpoint_name }} \
           -f ${{ github.workspace }}/ml-pipelines/cli/deploy/online/online-deployment.yml --resource-group ${{ vars.resource_group }} \
           --workspace-name ${{ vars.workspace_name }}
 
@@ -99,7 +94,7 @@ jobs:
         
     - name: allocate-traffic
       run: |
-          az ml online-endpoint update --name ${{ inputs.endpoint_name }} --traffic "${{ inputs.traffic_allocation }}" \
+          az ml online-endpoint update --name ${{ inputs.endpoint_name }} --traffic "${{ env.traffic_allocation }}" \
           --resource-group ${{ vars.resource_group }} --workspace-name ${{ vars.workspace_name }}
 
   

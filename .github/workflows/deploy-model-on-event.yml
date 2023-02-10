@@ -1,0 +1,15 @@
+name: Model deployment
+
+on:
+  repository_dispatch:
+    types: [machinelearningservices-modelregistered]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check variables
+        env:
+          PAYLOAD_CONTEXT: ${{ toJson(github.event.client_payload.data) }}
+        run: |
+          echo $PAYLOAD_CONTEXT

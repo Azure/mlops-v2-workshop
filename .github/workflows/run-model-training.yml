@@ -84,7 +84,7 @@ jobs:
         az configure --defaults group=${{vars.resource_group}} workspace=${{vars.workspace_name}}
 
     - name: run job
-      run: bash -x ./run-job.sh train/pipeline-code.yml ${{inputs.experiment_name}}
+      run: bash -x ../../ci-cd/ghactions/run-job.sh train/pipeline-code.yml ${{inputs.experiment_name}}
       working-directory: ml-pipelines/cli
 
   

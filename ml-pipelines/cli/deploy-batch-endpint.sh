@@ -8,4 +8,4 @@ az ml ________________ create --file deploy/batch/batch-endpoint.yml
 # create batch deployment
 az ml ________________ create --file deploy/batch/batch-deployment.yml --set-default
 # invoke and test endpoint
-#az ml batch-endpoint invoke --name taxi-batch-endpoint --input ../../data/taxi-batch.csv
+#az ml batch-endpoint invoke --name taxi-batch-endpoint --input ../../data/taxi-batch.csv --input-type uri_file

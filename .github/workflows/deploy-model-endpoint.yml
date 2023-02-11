@@ -1,0 +1,91 @@
+name: deploy model to endpoint 
+on:
+  workflow_dispatch:
+    inputs:
+      endpoint_name:
+        required: true
+        type: string
+        description: endpoint name
+        default: taxi-online-endpoint
+      model_name:  
+        required: true
+        type: string
+        description: model name
+        default: taxi-data@latest
+ 
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ml-pipelines/**
+      - .github/workflows/run-model-training.yml
+      - components/**
+      - ci-cd/ghactions/**
+
+env:
+  deployment_name: blue-${{github.run_number}}
+  traffic_allocation: blue-${{github.run_number}}=100
+
+jobs:
+
+  create-endpoint:
+    runs-on: ubuntu-latest
+    environment: stage
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+      - name: install-extension
+        run: |
+          az extension add -n ml -y
+          az configure --defaults group=${{vars.resource_group}} workspace=${{vars.workspace_name}}
+      - name: create-endpoint
+        run: bash -x ../../ci-cd/ghactions/create-endpoint.sh deploy/online/online-endpoint.yml ${{inputs.endpoint_name}} 
+        working-directory: ml-pipelines/cli
+
+            
+  create-deployment:
+    needs: [ create-endpoint ]
+    runs-on: ubuntu-latest
+    environment: stage
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+      - name: install-extension
+        run:  az extension add -n ml -y
+    
+      - name: create-online-deployment
+        run: |
+          az ml online-deployment create --name ${{ env.deployment_name }} --endpoint ${{ inputs.endpoint_name }} \
+          -f ${{ github.workspace }}/ml-pipelines/cli/deploy/online/online-deployment.yml --resource-group ${{ vars.resource_group }} \
+          --workspace-name ${{ vars.workspace_name }}
+
+  allocate-traffic:
+    runs-on: ubuntu-latest
+    environment: stage
+    needs: [  create-deployment ]
+    steps:
+    - name: check out repo
+      uses: actions/checkout@v2
+    - name: azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+
+    - name: install-extension
+      run:  |
+        az extension add -n ml -y
+        
+    - name: allocate-traffic
+      run: |
+          az ml online-endpoint update --name ${{ inputs.endpoint_name }} --traffic "${{ env.traffic_allocation }}" \
+          --resource-group ${{ vars.resource_group }} --workspace-name ${{ vars.workspace_name }}
+
+  

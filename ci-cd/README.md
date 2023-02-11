@@ -27,7 +27,3 @@ Following instructions to create CI pipeline for training:
     ![Predeployment Approval](./images/predeploy_approval.jpg)  
 
 
-
-## Createing CD + CD with Github Actions
-
-<https://learn.microsoft.com/en-us/azure/machine-learning/how-to-github-actions-machine-learning?tabs=userlevel>

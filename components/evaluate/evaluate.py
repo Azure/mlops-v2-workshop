@@ -135,9 +135,11 @@ def model_promotion(model_name, evaluation_output, X_test, y_test, yhat_test, sc
     predictions = {}
 
     client = MlflowClient()
+    print(f"searching model: {model_name}")
 
     for model_run in client.search_model_versions(f"name='{model_name}'"):
         model_version = model_run.version
+        print(f"model uri: models:/{model_name}/{model_version}")
         mdl = mlflow.pyfunc.load_model(
             model_uri=f"models:/{model_name}/{model_version}")
         predictions[f"{model_name}:{model_version}"] = mdl.predict(X_test)

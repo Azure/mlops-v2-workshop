@@ -39,8 +39,7 @@ def parse_args():
     '''Parse input arguments'''
 
     parser = argparse.ArgumentParser("train")
-    
-    parser.add_argument(### TO DO: Add train_data argument ###)
+    parser.add_argument("--train_data", type=str, help="Path to train dataset")
     parser.add_argument("--model_output", type=str, help="Path of output model")
 
     # classifier specific arguments
@@ -81,7 +80,13 @@ def main(args):
                                   random_state=0)
 
     # log model hyperparameters
-    ### TO DO: Use mlflow to log hyperparameters as parameters to AML run.
+    mlflow.log_param("model", "RandomForestRegressor")
+    mlflow.log_param("n_estimators", args.regressor__n_estimators)
+    mlflow.log_param("bootstrap", args.regressor__bootstrap)
+    mlflow.log_param("max_depth", args.regressor__max_depth)
+    mlflow.log_param("max_features", args.regressor__max_features)
+    mlflow.log_param("min_samples_leaf", args.regressor__min_samples_leaf)
+    mlflow.log_param("min_samples_split", args.regressor__min_samples_split)
 
     # Train model with the train set
     model.fit(X_train, y_train)
@@ -96,7 +101,10 @@ def main(args):
     mae = mean_absolute_error(y_train, yhat_train)
     
     # log model performance metrics
-    ### TO DO: Use mlflow to log training evaluation metrics as parameters to AML run.
+    mlflow.log_metric("train r2", r2)
+    mlflow.log_metric("train mse", mse)
+    mlflow.log_metric("train rmse", rmse)
+    mlflow.log_metric("train mae", mae)
 
     # Visualize results
     plt.scatter(y_train, yhat_train,  color='black')
@@ -107,7 +115,7 @@ def main(args):
     mlflow.log_artifact("regression_results.png")
     
     # Log the model using mlflow
-    ### TO DO: Use mlflow to log model to AML run outputs.
+    mlflow.sklearn.log_model(model, "model_output")
 
     # Save the model using mlflow
     mlflow.sklearn.save_model(model, args.model_output)

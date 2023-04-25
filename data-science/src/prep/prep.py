@@ -6,7 +6,6 @@ Prepares raw data and provides training, validation and test datasets
 import argparse
 
 from pathlib import Path
-import ruamel.yaml as yaml
 import os
 
 import numpy as np
@@ -37,18 +36,10 @@ def parse_args():
     parser.add_argument("--raw_data", type=str, help="Path to raw data")
     parser.add_argument("--train_data", type=str, help="Path to train dataset")
     parser.add_argument("--val_data", type=str, help="Path to test dataset")
-    parser.add_argument("--test_data", type=str, help="Path to test dataset")
-    parser.add_argument("--enable_monitoring", type=str, default="false", help="enable logging to ADX")
-    parser.add_argument("--table_name", type=str, default="mlmonitoring", help="Table name in ADX for logging")
-    
+    parser.add_argument("--test_data", type=str, help="Path to test dataset")    
     args = parser.parse_args()
 
     return args
-
-def log_training_data(df, table_name):
-    from obs.collector import Online_Collector
-    collector = Online_Collector(table_name)
-    collector.batch_collect(df)
 
 def main(args):
     '''Read, split, and save datasets'''
@@ -57,7 +48,6 @@ def main(args):
     # -------------------------------------- #
 
     data = pd.read_csv((Path(args.raw_data)))
-    print(data)
     data = data[NUMERIC_COLS + CAT_NOM_COLS + CAT_ORD_COLS + [TARGET_COL]]
 
     # ------------- Split Data ------------- #
@@ -82,30 +72,6 @@ def main(args):
     train.to_parquet((Path(args.train_data) / "train.parquet"))
     val.to_parquet((Path(args.val_data) / "val.parquet"))
     test.to_parquet((Path(args.test_data) / "test.parquet"))
-
-    if (args.enable_monitoring.lower == 'true' or args.enable_monitoring == '1' or args.enable_monitoring.lower == 'yes'):
-        log_training_data(data, args.table_name)
-
-    # Define mltable for train, val, test data
-    mltable_yaml_str = """\
-    type: mltable
-
-    paths:
-    - pattern: ./*.parquet
-    transformations:
-    - read_parquet:
-        include_path_column: "false"
-    """
-    
-    mltable = yaml.load(mltable_yaml_str, Loader=yaml.RoundTripLoader)
-    
-    # Save MLTable file in data directory
-    with open((Path(args.train_data) / "MLTable"), 'w') as outfile:
-        yaml.dump(mltable, outfile, Dumper=yaml.RoundTripDumper, indent=4)
-    with open((Path(args.val_data) / "MLTable"), 'w') as outfile:
-        yaml.dump(mltable, outfile, Dumper=yaml.RoundTripDumper, indent=4)
-    with open((Path(args.test_data) / "MLTable"), 'w') as outfile:
-        yaml.dump(mltable, outfile, Dumper=yaml.RoundTripDumper, indent=4)
 
 if __name__ == "__main__":
 

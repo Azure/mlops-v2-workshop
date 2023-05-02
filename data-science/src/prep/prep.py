@@ -35,7 +35,7 @@ def parse_args():
     parser = argparse.ArgumentParser("prep")
     parser.add_argument("--raw_data", type=str, help="Path to raw data")
     parser.add_argument("--train_data", type=str, help="Path to train dataset")
-    parser.add_argument("--val_data", type=str, help="Path to test dataset")
+    parser.add_argument("--val_data", type=str, help="Path to val dataset")
     parser.add_argument("--test_data", type=str, help="Path to test dataset")    
     args = parser.parse_args()
 

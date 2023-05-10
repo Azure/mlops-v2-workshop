@@ -64,19 +64,19 @@ This repo is practice repo for Community IP MLOps In a Day workshop. The goal is
 
 ## MLOps v2 Lab
 
-In this workshop, we provided both CLI and SDK exercise. You can choose your prefered option. The exercise starts from ml-pipeline folder. 
+In this workshop, we provided both CLI and SDK exercise. You can choose your preferred option. The exercise starts from ml-pipeline folder. 
 
 There are 2 labs in this workshop:
 
 ## Lab 1. Building a training pipeline. It can be a custom model pipeline or automl pipeline.
   - Experiment with notebooks in `notebooks` folder to explore data and model 
-  - Build pipeline by nativateing to `ml-pipelines` cli or sdk and running corresponding notebooks
-  - Review components of the pipeline and fill in missing parts and refrences 
-  - Once pipeline is run Model will be trained and registered in the WS registry
+  - Build pipeline by navigating to `ml-pipelines` cli or sdk and running corresponding notebooks
+  - Review components of the pipeline and fill in missing parts and references 
+  - Once pipeline is run, Model will be trained and registered in the WS registry
 
 ## Lab 2. Building a deployment pipeline, it could either a online endpoint or batch online. 
-  - Deploy Model by nativateing to `ml-pipelines` cli or sdk and running corresponding notebooks
-  - In this lab, we also provided ci-cd folder to demonstrate Azure Pipeline or Github action orchastration of CI/CD pipeline. 
+  - Deploy Model by navigating to `ml-pipelines` cli or sdk and running corresponding notebooks
+  - In this lab, we also provided ci-cd folder to demonstrate Azure Pipeline or Github action orchestration of CI/CD pipeline. 
     - For GH Actions follow https://github.com/lenisha/mlops-v2-workshop/blob/main/ci-cd/README-GH.md
 
 
